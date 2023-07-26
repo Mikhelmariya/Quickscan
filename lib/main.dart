@@ -43,10 +43,11 @@ class _OpenAIAppState extends State<OpenAIApp> {
       // Just making sure it is not empty
       if (event != null && event!.isNotEmpty) {
         print(event);
-        event = event.replaceAll("\\n", "\n");
+        //event = event.replaceAll("\\n", "\n");
         setState(() {
-          processedText = event
-              .toString(); // Update the processedText state with the received text.
+          final jsonResponse = jsonDecode(event);
+          processedText = jsonResponse[
+              'processedText']; // Update the processedText state with the received text.
         });
         // Now only close the connection and we are done here!
         channel!.sink.close();
