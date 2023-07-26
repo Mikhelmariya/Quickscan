@@ -1,121 +1,60 @@
-//const {processEnv} = require('./env');
 const express = require('express');
+const { Server } = require('ws');
+
+const PORT = process.env.PORT || 3000;
 const app = express();
+
+// Initialize WebSocket server
+const server = app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+const wss = new Server({ server });
 
 const { Configuration, OpenAIApi } = require("openai");
 
-const configuration = new Configuration({
-  apiKey:  process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
- // Import the fetch module
-const port = 3000;
-
-app.use(express.json());
 
 
 
+// Handle WebSocket connections
+wss.on('connection', ws => {
+  console.log('WebSocket connected');
 
-app.post('/processText', (req, res) => {
-  const { text } = req.body;
+  // Listen for incoming messages from the user
+  ws.on('message', async message => {
+    try {
+      const data = JSON.parse(message);
+      const { text, apiKey } = data;
 
-  // Process the text using the desired function
-  processTextFunction(text)
-    .then(processedText => {
-      res.json({ processedText });
-    })
-    .catch(error => {
+      // Now you have the input text and the API key, you can use them in the processing function
+      const processedText = await processTextFunction(text, apiKey);
+
+      ws.send(JSON.stringify({ processedText }));
+    } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'An error occurred while processing the text.' });
-    });
+      ws.send(JSON.stringify({ error: 'An error occurred while processing the text.' }));
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket disconnected');
+  });
 });
 
-app.listen(port,'192.168.1.5',() => {
-  console.log(`Server is running on port ${port}`);
-});
-// instruction object has two key value pairs: role and content
-const Conversation =[{
-  'role':'system', // tells open ai what comes next is an instruction
-  'content':'You are a creative story teller.help develop stories for users'
-}]
+
 
 async function processTextFunction(text) {
+ 
+  const configuration = new Configuration({
+    apiKey: apiKey,
+  });
 
-  Conversation.push({
-    'role':'user',
-    'content':text
-  })
+  const openai = new OpenAIApi(configuration);
+
   const response = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: `Read from the website ${text} and generate short key points for quick revision covering everything given in the site highlighting relevant points. Generate points so as to by heart and be simple and efficient
-    `,
+    prompt: `Read from the website ${text} and generate short key points for quick revision covering everything given in the site highlighting relevant points. Generate points so as to by heart and be simple and efficient`,
     temperature: 0.2,
-    max_tokens: 50,
-    
-   
+    max_tokens: 30,
   });
+
   console.log(response);
-  
   return response.data.choices[0].text;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// app.post('/processImage', (req, res) => {
-//   const {img_prompt} = req.body;
-//   processImage(img_prompt).then(processedImage => {
-//     res.json({ processedImage });
-//   })
-//   .catch(error => {
-//     console.error(error);
-//     res.status(500).json({ error: 'An error occurred while processing the image.' });
-//   });
-// });
-
-
-
-// async function processImage(img_prompt) {
-
-
-//   const response = await openai.createImage({
-  
-//     prompt: "a painting of a cat sitting on a chair",
-//     n:1,
-//     size: '256x256',
-//     response_format:'url'
-   
-//   });
-//   console.log(response.data.data[0].url);
-  
-//   return response.data.data[0].url
-// }
-
-
-
-//prompt: `Write me a detailed step-by-step recipe by a professional chef for something healthy I can make with the following ingredients:\n\n${text}`,

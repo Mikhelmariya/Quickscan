@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 import 'dart:io';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart'; // Import the web_socket_channel package.
 
 void main() {
   runApp(const OpenAIApp());
@@ -16,68 +19,39 @@ class OpenAIApp extends StatefulWidget {
 
 class _OpenAIAppState extends State<OpenAIApp> {
   final TextEditingController _input = TextEditingController();
+  final TextEditingController _apiKey = TextEditingController();
   String processedText = '';
-  String img_url = 'jj';
+  String img_url = '';
   String apiKey = "";
 
-  void saveApiKeyToFile() async {
-    final file = File('/env.js');
-    await file.writeAsString('OPENAI_API_KEY=$apiKey');
-  }
-
-  Future<void> makeImage() async {
-    const url = 'http://192.168.1.35:4000/processImage';
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'text': _input.text,
-      }),
-    );
-    if (response.statusCode == 200) {
-      print("success");
-    } else {
-      print(
-          'image API request  failed with status code ${response.statusCode}');
+  Future<void> makeAPIRequest(String text, String apiKey) async {
+    WebSocketChannel? channel;
+    // We use a try - catch statement, because the connection might fail.
+    try {
+      // Connect to our backend.
+      channel = WebSocketChannel.connect(Uri.parse('ws://localhost:3000'));
+    } catch (e) {
+      // If there is any error that might be because you need to use another connection.
+      print("Error on connecting to websocket: " + e.toString());
     }
-  }
+    // Send message to backend
+    final jsonMessage = {'text': text, 'apiKey': apiKey};
+    channel?.sink.add(jsonEncode(jsonMessage));
 
-  Future<void> makeAPIRequest() async {
-    const url = 'http://192.168.1.5:3000/processText';
-    //  const url = '/processText';
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'text': _input.text,
-      }),
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      String? text;
-      if (data['processedText'] is String) {
-        text = data['processedText'];
-      } else if (data['processedText'] is Map) {
-        final processedTextResult =
-            data['processedText'] as Map<String, dynamic>;
-        text = processedTextResult['text'];
-      }
-      if (text != null) {
-        print(text);
+    // Listen for any message from backend
+    channel?.stream.listen((event) {
+      // Just making sure it is not empty
+      if (event != null && event!.isNotEmpty) {
+        print(event);
+        event = event.replaceAll("\\n", "\n");
         setState(() {
-          processedText = text!;
+          processedText = event
+              .toString(); // Update the processedText state with the received text.
         });
-      } else {
-        print('Invalid response format');
+        // Now only close the connection and we are done here!
+        channel!.sink.close();
       }
-    } else {
-      print('API request failed with status code ${response.statusCode}');
-    }
-    print(response);
-    final data = response.body;
-    print(data);
+    });
   }
 
   @override
@@ -98,11 +72,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
               children: [
                 const SizedBox(height: 80),
                 TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      apiKey = value;
-                    });
-                  },
+                  controller: _apiKey,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -111,6 +81,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     labelText: 'Enter API Key',
                     labelStyle: const TextStyle(color: Colors.tealAccent),
                   ),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -160,7 +131,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     //   ),
                     // );
                     //
-                    makeAPIRequest();
+                    makeAPIRequest(_input.text, _apiKey.text);
                   },
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -182,6 +153,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     print("clear Button pressed");
                     setState(() {
                       Text(processedText = '');
+                      _input.clear();
                     });
                     // saveApiKeyToFile();
                     // showDialog(
