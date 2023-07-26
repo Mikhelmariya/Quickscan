@@ -145,7 +145,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('Submit', textAlign: TextAlign.center),
+                    child: const Text('Summarize', textAlign: TextAlign.center),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -186,7 +186,8 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('Clear', textAlign: TextAlign.center),
+                    child: const Text('Clear Response',
+                        textAlign: TextAlign.center),
                   ),
                 ),
               ],

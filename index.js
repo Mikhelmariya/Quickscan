@@ -40,7 +40,7 @@ wss.on('connection', ws => {
 
 
 
-async function processTextFunction(text) {
+async function processTextFunction(text,apiKey) {
  
   const configuration = new Configuration({
     apiKey: apiKey,
@@ -49,10 +49,10 @@ async function processTextFunction(text) {
   const openai = new OpenAIApi(configuration);
 
   const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: `Read from the website ${text} and generate important points for quick revision covering everything given in the website . Generate  simple and efficient points and avoid redundancy`,
-    temperature: 0.2,
-    max_tokens: 300,
+    model: 'text-davinci-003',
+    prompt: `Read from the website ${text} and generate important points for quick revision covering everything given in the website `,
+    temperature: 1,
+    max_tokens: 800,
   });
 
   console.log(response);
