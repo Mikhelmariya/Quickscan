@@ -50,9 +50,9 @@ async function processTextFunction(text) {
 
   const response = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: `Read from the website ${text} and generate short key points for quick revision covering everything given in the site highlighting relevant points. Generate points so as to by heart and be simple and efficient`,
+    prompt: `Read from the website ${text} and generate important points for quick revision covering everything given in the website . Generate  simple and efficient points and avoid redundancy`,
     temperature: 0.2,
-    max_tokens: 30,
+    max_tokens: 300,
   });
 
   console.log(response);
