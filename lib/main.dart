@@ -17,7 +17,7 @@ class OpenAIApp extends StatefulWidget {
 class _OpenAIAppState extends State<OpenAIApp> {
   final TextEditingController _input = TextEditingController();
   String processedText = '';
-  String img_url = '';
+  String img_url = 'jj';
   String apiKey = "";
 
   void saveApiKeyToFile() async {
