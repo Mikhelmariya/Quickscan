@@ -15,7 +15,7 @@ class OpenAIApp extends StatefulWidget {
 }
 
 class _OpenAIAppState extends State<OpenAIApp> {
-  TextEditingController _input = TextEditingController();
+  final TextEditingController _input = TextEditingController();
   String processedText = '';
   String img_url = '';
   String apiKey = "";
@@ -87,7 +87,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
       home: Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
-          title: Center(child: Text('QuickScan')),
+          title: const Center(child: Text('QuickScan')),
           backgroundColor: Colors.teal,
         ),
         body: Padding(
@@ -96,7 +96,7 @@ class _OpenAIAppState extends State<OpenAIApp> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 TextField(
                   onChanged: (value) {
                     setState(() {
@@ -106,39 +106,39 @@ class _OpenAIAppState extends State<OpenAIApp> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.tealAccent),
+                      borderSide: const BorderSide(color: Colors.tealAccent),
                     ),
                     labelText: 'Enter API Key',
-                    labelStyle: TextStyle(color: Colors.tealAccent),
+                    labelStyle: const TextStyle(color: Colors.tealAccent),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _input,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.tealAccent),
+                      borderSide: const BorderSide(color: Colors.tealAccent),
                     ),
                     labelText: 'Enter the website link',
-                    labelStyle: TextStyle(color: Colors.tealAccent),
+                    labelStyle: const TextStyle(color: Colors.tealAccent),
                   ),
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 if (processedText.isNotEmpty)
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.grey[200],
                     ),
                     child: Text(
                       processedText,
-                      style: TextStyle(fontSize: 18, color: Colors.black),
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
                     ),
                   ),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
                 ElevatedButton(
                   onPressed: () {
                     print("Button pressed");
@@ -162,6 +162,12 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     //
                     makeAPIRequest();
                   },
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Colors.teal),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -169,14 +175,8 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     ),
                     child: const Text('Submit', textAlign: TextAlign.center),
                   ),
-                  style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      backgroundColor: Colors.teal),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     print("clear Button pressed");
@@ -202,6 +202,12 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     // );
                     //
                   },
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Colors.teal),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -209,12 +215,6 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     ),
                     child: const Text('Clear', textAlign: TextAlign.center),
                   ),
-                  style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      backgroundColor: Colors.teal),
                 ),
               ],
             ),
