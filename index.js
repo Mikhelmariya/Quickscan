@@ -1,5 +1,7 @@
 const express = require('express');
 const { Server } = require('ws');
+const axios = require('axios');
+
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -19,6 +21,8 @@ wss.on('connection', ws => {
 
   // Listen for incoming messages from the user
   ws.on('message', async message => {
+
+    
     try {
       const data = JSON.parse(message);
       const { text, apiKey } = data;
@@ -37,6 +41,15 @@ wss.on('connection', ws => {
     console.log('WebSocket disconnected');
   });
 });
+async function fetchWebsiteContent(websiteUrl) {
+  try {
+    const response = await axios.get(websiteUrl);
+    return response.data; // Assuming the website returns HTML content
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to fetch website content.');
+  }
+}
 
 
 
@@ -47,7 +60,7 @@ async function processTextFunction(text,apiKey) {
   });
 
   const openai = new OpenAIApi(configuration);
-
+  
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `Read from the website ${text} and generate important points for quick revision covering everything given in the website `,

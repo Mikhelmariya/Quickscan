@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:web_socket_channel/io.dart';
+import 'package:flutter/services.dart';
 import 'package:web_socket_channel/web_socket_channel.dart'; // Import the web_socket_channel package.
 
 void main() {
@@ -52,6 +53,16 @@ class _OpenAIAppState extends State<OpenAIApp> {
         // Now only close the connection and we are done here!
         channel!.sink.close();
       }
+    });
+  }
+
+  void copyTextToClipboard(processedText) {
+    Clipboard.setData(ClipboardData(text: processedText));
+    // Show a toast or any other feedback to the user that the text is copied.
+    setState(() {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Text copied to clipboard')),
+      );
     });
   }
 
@@ -156,24 +167,6 @@ class _OpenAIAppState extends State<OpenAIApp> {
                       Text(processedText = '');
                       _input.clear();
                     });
-                    // saveApiKeyToFile();
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (context) => AlertDialog(
-                    //     title: Text('API Key Saved'),
-                    //     content: Text(
-                    //         'Your API key has been saved to the .env file.'),
-                    //     actions: [
-                    //       ElevatedButton(
-                    //         onPressed: () {
-                    //           Navigator.pop(context);
-                    //         },
-                    //         child: Text('OK'),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // );
-                    //
                   },
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -188,6 +181,28 @@ class _OpenAIAppState extends State<OpenAIApp> {
                     ),
                     child: const Text('Clear Response',
                         textAlign: TextAlign.center),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    print("copy Button pressed");
+                    setState(() {
+                      copyTextToClipboard(processedText);
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Colors.teal),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('Copy', textAlign: TextAlign.center),
                   ),
                 ),
               ],
